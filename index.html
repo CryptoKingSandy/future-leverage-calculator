@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Calculator</title>
+    <!-- Latest Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #343a40;
+            color: #ffffff;
+        }
+
+        .btn-calculate {
+            background-color: #007bff;
+            color: #ffffff;
+            transition: background-color 0.2s;
+        }
+
+        .btn-calculate:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-clear {
+            background-color: #6c757d;
+            color: #ffffff;
+            transition: background-color 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #495057;
+        }
+
+        h2 {
+            color: #343a40;
+            margin-top: 20px;
+        }
+
+        .table {
+            background-color: #ffffff;
+        }
+
+        .table td,
+        .table th {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+        }
+
+        .table-bordered {
+            border: 2px solid #dee2e6;
+        }
+
+        .result-value {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Future Leverage - Stop Loss & Take Profit Calculator</h4>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="amount" class="form-label">Amount</label>
+                            <input type="number" step="0.01" class="form-control" id="amount" placeholder="Enter Amount"
+                                required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="leverage" class="form-label">Leverage</label>
+                            <input type="number" class="form-control" id="leverage" min="2" max="50"
+                                placeholder="Enter Leverage" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="entryPrice" class="form-label">Entry Price</label>
+                            <input type="number" step="0.01" class="form-control" id="entryPrice"
+                                placeholder="Enter Entry Price" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="stopLoss" class="form-label">Stop Loss At</label>
+                            <input type="number" step="0.01" class="form-control" id="stopLoss"
+                                placeholder="Enter Stop Loss" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="takeprofit" class="form-label">Take Profit At</label>
+                            <input type="number" step="0.01" class="form-control" id="takeprofit"
+                                placeholder="Enter Entry Price" required>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button type="button" class="btn btn-calculate mr-2" onclick="calculate()">Calculate</button>
+                        <button type="button" class="btn btn-clear" onclick="clearFields()">Clear</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="container mt-4">
+            <h2>Results</h2>
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <td>Amount (with Leverage)</td>
+                        <td id="tradingInfo" class="result-value">-</td>
+                    </tr>
+                    <tr>
+                        <td>Loss in USDT</td>
+                        <td id="lossUSDT" class="result-value">-</td>
+                    </tr>
+                    <tr>
+                        <td>Loss in %</td>
+                        <td id="lossPercentage" class="result-value">-</td>
+                    </tr>
+                    <tr>
+                        <td>Profit in USDT</td>
+                        <td id="profitUSDT" class="result-value">-</td>
+                    </tr>
+                    <tr>
+                        <td>Profit in %</td>
+                        <td id="profitPercentage" class="result-value">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            // Get input values
+            const amount = parseFloat(document.getElementById("amount").value);
+            const leverage = parseFloat(document.getElementById("leverage").value);
+            const entryPrice = parseFloat(document.getElementById("entryPrice").value);
+            const stopLoss = parseFloat(document.getElementById("stopLoss").value);
+            const takeProfit = parseFloat(document.getElementById("takeprofit").value);
+
+            // Calculate trading information
+            const tradingInfo = amount * leverage;
+            const lossUSDT = (entryPrice - stopLoss) * ((amount * leverage) / entryPrice);
+            const lossPercentage = (lossUSDT / amount) * 100;
+            const profitUSDT = (takeProfit - entryPrice) * ((amount * leverage) / entryPrice);
+            const profitPercentage = (profitUSDT / amount) * 100;
+
+            // Set values in the results table
+            document.getElementById("tradingInfo").textContent = tradingInfo.toFixed(2);
+            document.getElementById("lossUSDT").textContent = lossUSDT.toFixed(2);
+            document.getElementById("lossPercentage").textContent = lossPercentage.toFixed(2) + "%";
+            document.getElementById("profitUSDT").textContent = profitUSDT.toFixed(2);
+            document.getElementById("profitPercentage").textContent = profitPercentage.toFixed(2) + "%";
+        }
+        function clearFields() {
+            // Clear input fields
+            document.getElementById("amount").value = "";
+            document.getElementById("leverage").value = "";
+            document.getElementById("entryPrice").value = "";
+            document.getElementById("stopLoss").value = "";
+            document.getElementById("takeprofit").value = "";
+
+            // Clear results
+            document.getElementById("tradingInfo").textContent = "-";
+            document.getElementById("lossUSDT").textContent = "-";
+            document.getElementById("lossPercentage").textContent = "-";
+            document.getElementById("profitUSDT").textContent = "-";
+            document.getElementById("profitPercentage").textContent = "-";
+        }
+    </script>
+</body>
+
+</html>
