@@ -68,6 +68,25 @@
         .result-value {
             font-weight: bold;
         }
+
+        /* Styling for results based on value */
+        .negative-result {
+            color: red !important;
+        }
+
+        .positive-result {
+            color: green !important;
+        }
+
+        /* Radio buttons in one line */
+        .radio-inline {
+            display: flex;
+            align-items: center;
+        }
+
+        .radio-inline input[type="radio"] {
+            margin-right: 5px;
+        }
     </style>
 </head>
 
@@ -97,7 +116,17 @@
                             <input type="number" step="0.01" class="form-control" id="entryPrice"
                                 placeholder="Enter Entry Price" required>
                         </div>
+                        <div class="col-md-6">
+                            <label for="tradeType" class="form-label">Trade Type</label>
+                            <div class="radio-inline">
+                                <input type="radio" id="long" name="tradeType" value="long" checked>
+                                <label for="long">Long</label>
+                                <input type="radio" id="short" name="tradeType" value="short">
+                                <label for="short">Short</label>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="stopLoss" class="form-label">Stop Loss At</label>
@@ -128,19 +157,19 @@
                     </tr>
                     <tr>
                         <td>Loss in USDT</td>
-                        <td id="lossUSDT" class="result-value">-</td>
+                        <td id="lossUSDT" class="result-value negative-result">-</td>
                     </tr>
                     <tr>
                         <td>Loss in %</td>
-                        <td id="lossPercentage" class="result-value">-</td>
+                        <td id="lossPercentage" class="result-value negative-result">-</td>
                     </tr>
                     <tr>
                         <td>Profit in USDT</td>
-                        <td id="profitUSDT" class="result-value">-</td>
+                        <td id="profitUSDT" class="result-value positive-result">-</td>
                     </tr>
                     <tr>
                         <td>Profit in %</td>
-                        <td id="profitPercentage" class="result-value">-</td>
+                        <td id="profitPercentage" class="result-value positive-result">-</td>
                     </tr>
                 </tbody>
             </table>
@@ -156,20 +185,32 @@
             const stopLoss = parseFloat(document.getElementById("stopLoss").value);
             const takeProfit = parseFloat(document.getElementById("takeprofit").value);
 
+            // Get selected trade type
+            const tradeType = document.querySelector('input[name="tradeType"]:checked').value;
+
+            // Adjust calculations based on trade type
+            let lossUSDT, profitUSDT;
+            if (tradeType === "long") {
+                lossUSDT = (entryPrice - stopLoss) * ((amount * leverage) / entryPrice);
+                profitUSDT = (takeProfit - entryPrice) * ((amount * leverage) / entryPrice);
+            } else if (tradeType === "short") {
+                lossUSDT = (stopLoss - entryPrice) * ((amount * leverage) / entryPrice);
+                profitUSDT = (entryPrice - takeProfit) * ((amount * leverage) / entryPrice);
+            }
+
             // Calculate trading information
             const tradingInfo = amount * leverage;
-            const lossUSDT = (entryPrice - stopLoss) * ((amount * leverage) / entryPrice);
             const lossPercentage = (lossUSDT / amount) * 100;
-            const profitUSDT = (takeProfit - entryPrice) * ((amount * leverage) / entryPrice);
             const profitPercentage = (profitUSDT / amount) * 100;
 
             // Set values in the results table
             document.getElementById("tradingInfo").textContent = tradingInfo.toFixed(2);
-            document.getElementById("lossUSDT").textContent = lossUSDT.toFixed(2);
-            document.getElementById("lossPercentage").textContent = lossPercentage.toFixed(2) + "%";
-            document.getElementById("profitUSDT").textContent = profitUSDT.toFixed(2);
-            document.getElementById("profitPercentage").textContent = profitPercentage.toFixed(2) + "%";
+            document.getElementById("lossUSDT").textContent = "-" + lossUSDT.toFixed(2);
+            document.getElementById("lossPercentage").textContent = "-" + lossPercentage.toFixed(2) + "%";
+            document.getElementById("profitUSDT").textContent = "+" + profitUSDT.toFixed(2);
+            document.getElementById("profitPercentage").textContent = "+" + profitPercentage.toFixed(2) + "%";
         }
+
         function clearFields() {
             // Clear input fields
             document.getElementById("amount").value = "";
